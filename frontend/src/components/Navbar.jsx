@@ -163,7 +163,7 @@ const Navbar = () => {
                         className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
                       >
                         <Briefcase size={16} />
-                        Applied Jobs
+                        My profile
                       </Link>
 
                       <button

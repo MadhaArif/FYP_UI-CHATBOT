@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+// import React, { useContext } from "react";
 import { Route, Routes } from "react-router-dom";
 import AppLayout from "./layout/AppLayout";
 import About from "./pages/About";
@@ -22,7 +22,7 @@ import { useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 const App = () => {
-  const { companyToken } = useContext(AppContext);
+  // const { companyToken } = useContext(AppContext);
   const location = useLocation();
   const hideLayout = location.pathname.startsWith("/dashboard");
   return (
