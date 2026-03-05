@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import axios from "axios";
 import { MessageCircle, Send, X, Bot, User, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AppContext } from "../context/AppContext";
 
 function Chatbot() {
+  const { backendUrl } = useContext(AppContext);
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([
@@ -34,7 +36,7 @@ function Chatbot() {
 
     try {
       // Pass history to the backend for context
-      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/chatbot/chat`, {
+      const res = await axios.post(`${backendUrl || ""}/chatbot/chat`, {
         message: userMsg,
         history: chat.slice(-10) // Only send last 10 messages to keep context concise
       });
