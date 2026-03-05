@@ -1,5 +1,13 @@
 import express from "express";
-import "dotenv/config";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, ".env") });
+
 import cors from "cors";
 import connectDB from "./db/connectDB.js";
 
@@ -9,12 +17,15 @@ import jobRoutes from "./routes/jobRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import Cloudinary from "./src/utils/cloudinary.js";
+import chatRoutes from "./routes/chatRoutes.js";
 
 const app = express();
 
-app.use(cors());
+app.use(cors()); // Simplified CORS to allow all for debugging
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/chatbot", chatRoutes);
 
 // 🧩 Connect MongoDB safely
 connectDB();

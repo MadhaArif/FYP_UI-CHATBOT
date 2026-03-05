@@ -89,9 +89,9 @@ const Counter = () => {
               start={1}
               end={898}
               duration={3}
-              enableScrollSpy={true}
-              scrollSpyOnce={false}
-            />
+            >
+              {({ countUpRef }) => <span ref={countUpRef} />}
+            </CountUp>
             <span>K</span>
           </div>
           <span className="text-gray-600">Daily active users</span>
@@ -100,27 +100,27 @@ const Counter = () => {
           <div className="text-4xl font-bold text-blue-600 mb-2">
             <CountUp
               start={1}
-              end={298}
+              end={50}
               duration={3}
-              enableScrollSpy={true}
-              scrollSpyOnce={false}
-              suffix="+"
-            />
+            >
+              {({ countUpRef }) => <span ref={countUpRef} />}
+            </CountUp>
+            <span>K</span>
           </div>
-          <span className="text-gray-600">Open job positions</span>
+          <span className="text-gray-600">Open Jobs</span>
         </div>
         <div className="text-center p-4">
           <div className="text-4xl font-bold text-blue-600 mb-2">
             <CountUp
               start={1}
-              end={20000}
+              end={200}
               duration={3}
-              enableScrollSpy={true}
-              scrollSpyOnce={false}
-              suffix="+"
-            />
+            >
+              {({ countUpRef }) => <span ref={countUpRef} />}
+            </CountUp>
+            <span>K</span>
           </div>
-          <span className="text-gray-600">Stories shared</span>
+          <span className="text-gray-600">Partners</span>
         </div>
       </div>
     </section>

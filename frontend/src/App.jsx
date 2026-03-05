@@ -21,6 +21,8 @@ import ProfileDetails from "./pages/ProfileDetails";
 import { useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import Chatbot from "./components/Chatbot";
+
 const App = () => {
   // const { companyToken } = useContext(AppContext);
   const location = useLocation();
@@ -52,6 +54,7 @@ const App = () => {
       </Routes>
     </AppLayout>
      {!hideLayout && <Footer />}
+     <Chatbot />
      </>
   );
 };

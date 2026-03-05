@@ -8,6 +8,7 @@ import Counter from "../components/Counter";
 import Download from "../components/Download";
 // import Footer from "../components/Footer";
 import { AppContext } from "../context/AppContext";
+import Chatbot from "../components/Chatbot";
 
 const Home = () => {
   const { fetchJobsData } = useContext(AppContext);
