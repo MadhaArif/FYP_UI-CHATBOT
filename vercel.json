@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/api.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/chatbot/(.*)",
+      "destination": "backend/api.js"
+    },
+    {
+      "source": "/user/(.*)",
+      "destination": "backend/api.js"
+    },
+    {
+      "source": "/company/(.*)",
+      "destination": "backend/api.js"
+    },
+    {
+      "source": "/job/(.*)",
+      "destination": "backend/api.js"
+    },
+    {
+      "source": "/recommendation/(.*)",
+      "destination": "backend/api.js"
+    },
+    {
+      "source": "/notification/(.*)",
+      "destination": "backend/api.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "frontend/$1"
+    }
+  ]
+}

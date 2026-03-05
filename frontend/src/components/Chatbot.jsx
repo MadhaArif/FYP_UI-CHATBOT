@@ -34,7 +34,7 @@ function Chatbot() {
 
     try {
       // Pass history to the backend for context
-      const res = await axios.post("http://localhost:5000/chatbot/chat", {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/chatbot/chat`, {
         message: userMsg,
         history: chat.slice(-10) // Only send last 10 messages to keep context concise
       });
