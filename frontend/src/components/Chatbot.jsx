@@ -39,7 +39,13 @@ function Chatbot() {
       const res = await axios.post(`${backendUrl || ""}/chatbot/chat`, {
         message: userMsg,
         history: chat.slice(-10) // Only send last 10 messages to keep context concise
+      }, {
+        timeout: 15000 // 15 seconds timeout
       });
+
+      if (!res.data.success) {
+        throw new Error(res.data.reply || "Failed to get reply");
+      }
 
       setChat((prev) => {
         const newChat = [...prev];
@@ -47,10 +53,20 @@ function Chatbot() {
         return newChat;
       });
     } catch (error) {
-      setChat((prev) => [
-        ...prev,
-        { bot: "Sorry, I'm having trouble connecting right now." },
-      ]);
+      console.error("Chatbot frontend error:", error);
+      let errorMsg = "Sorry, I'm having trouble connecting right now.";
+      
+      if (error.code === 'ECONNABORTED') {
+        errorMsg = "Request timed out. Vercel's hobby plan limits might be affecting this. Try again!";
+      } else if (error.response) {
+        errorMsg = `Server error (${error.response.status}). Please check Vercel logs.`;
+      }
+
+      setChat((prev) => {
+        const newChat = [...prev];
+        newChat[newChat.length - 1].bot = errorMsg;
+        return newChat;
+      });
     } finally {
       setIsLoading(false);
     }

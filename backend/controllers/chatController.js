@@ -5,20 +5,23 @@ import Company from "../models/Company.js";
 export const chatWithAI = async (req, res) => {
   try {
     const { message, history = [] } = req.body;
-    console.log("DEBUG: Natural Chat request received");
+    console.log("DEBUG: Natural Chat request received with message:", message);
 
     const apiKey = process.env.OPENROUTER_API_KEY; 
     
     if (!apiKey) {
+      console.error("❌ ERROR: OPENROUTER_API_KEY is missing in process.env");
       return res.status(200).json({ 
         success: true, 
-        reply: "OpenRouter API Key is missing. Please add it to your .env file." 
+        reply: "OpenRouter API Key is missing. Please add it to your environment variables." 
       });
     }
 
-    // 1. Fetch real-time system data (Increased limit for better coverage)
+    // 1. Fetch real-time system data
+    console.log("⏳ Fetching data from MongoDB...");
     const jobs = await Job.find({ visible: true }).limit(20).populate('companyId', 'name');
     const companies = await Company.find().limit(10).select('name location description');
+    console.log(`✅ Data fetched. Jobs: ${jobs.length}, Companies: ${companies.length}`);
 
     const systemContext = `
 You are the helpful and professional Campus Connect AI assistant. 
@@ -69,10 +72,12 @@ WHEN ASKED ABOUT GOOGLE/INTERNET ACCESS:
       { role: "user", content: message }
     ];
 
+    console.log("⏳ Sending request to OpenRouter...");
     const completion = await openai.chat.completions.create({
       model: "google/gemini-2.0-flash-001",
       messages: messages,
     });
+    console.log("✅ Received reply from OpenRouter.");
 
     const reply = completion.choices[0].message.content;
 

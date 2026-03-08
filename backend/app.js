@@ -31,11 +31,25 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/chatbot", chatRoutes);
 
 // 🧩 Connect MongoDB safely
-connectDB();
+if (process.env.NODE_ENV !== 'production') {
+  connectDB();
+}
 Cloudinary();
 
 
 app.get("/", (req, res) => res.send("✅ API is working fine on Vercel"));
+
+// Wrap all routes with a DB connection middleware for production
+if (process.env.NODE_ENV === 'production') {
+  app.use(async (req, res, next) => {
+    try {
+      await connectDB();
+      next();
+    } catch (err) {
+      res.status(500).json({ success: false, message: "Database connection failed" });
+    }
+  });
+}
 
 app.use("/user", userRoutes);
 app.use("/company", companyRoutes);
