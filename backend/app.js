@@ -21,7 +21,10 @@ import chatRoutes from "./routes/chatRoutes.js";
 
 const app = express();
 
-app.use(cors()); // Simplified CORS to allow all for debugging
+app.use(cors({
+  origin: ["http://localhost:5173", "https://campus-connect-app.vercel.app"],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

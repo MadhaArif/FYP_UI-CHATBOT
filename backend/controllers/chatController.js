@@ -51,9 +51,9 @@ WHEN ASKED ABOUT GOOGLE/INTERNET ACCESS:
 
     const openai = new OpenAI({
       baseURL: "https://openrouter.ai/api/v1",
-      apiKey: apiKey.replace(/"/g, ''),
+      apiKey: apiKey.replace(/"/g, '').trim(),
       defaultHeaders: {
-        "HTTP-Referer": "http://localhost:5173",
+        "HTTP-Referer": "https://campus-connect-app.vercel.app",
         "X-Title": "Campus Connect App",
       }
     });
