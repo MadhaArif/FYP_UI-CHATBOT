@@ -7,9 +7,16 @@ const connectDB = async () => {
       return;
     }
 
+    const dbUri = process.env.DATABASE_CONNECTION_URL || process.env.MONGODB_URI;
+
+    if (!dbUri) {
+      console.error("❌ ERROR: MongoDB Connection URL (DATABASE_CONNECTION_URL or MONGODB_URI) is missing in process.env");
+      throw new Error("MongoDB URI is undefined");
+    }
+
     console.log("⏳ Connecting to MongoDB...");
 
-    await mongoose.connect(process.env.DATABASE_CONNECTION_URL, {
+    await mongoose.connect(dbUri, {
       serverSelectionTimeoutMS: 15000, // Wait 15s for connection
     });
 
