@@ -1,11 +1,15 @@
 import OpenAI from "openai";
 import Job from "../models/Job.js";
 import Company from "../models/Company.js";
+import connectDB from "../db/connectDB.js";
 
 export const chatWithAI = async (req, res) => {
   try {
     const { message, history = [] } = req.body;
     console.log("DEBUG: Natural Chat request received with message:", message);
+
+    // 🔗 Ensure DB is connected first (especially for serverless)
+    await connectDB();
 
     const apiKey = process.env.OPENROUTER_API_KEY; 
     
