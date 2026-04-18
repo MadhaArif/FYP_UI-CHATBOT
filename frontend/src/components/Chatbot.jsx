@@ -35,10 +35,8 @@ function Chatbot() {
     setIsLoading(true);
 
     try {
-      // Pass history to the backend for context
       const res = await axios.post(`${backendUrl || ""}/chatbot/chat`, {
         message: userMsg,
-        history: chat.slice(-10) // Only send last 10 messages to keep context concise
       }, {
         timeout: 15000 // 15 seconds timeout
       });

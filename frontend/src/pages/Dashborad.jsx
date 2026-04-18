@@ -117,12 +117,17 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="flex items-center justify-between border-b border-gray-200 py-3 bg-white sticky top-0 z-10 px-4">
+      <header className="sticky top-0 z-10 bg-white/75 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
+        <div className="h-[2px] w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600" />
+        <div className="flex items-center justify-between py-3 px-4 md:px-6">
         <Link
           to="/dashboard"
-          className="flex items-center text-blue-500 font-bold"
+          className="flex items-center gap-2 font-extrabold tracking-tight text-slate-900"
         >
-          Campus Connect
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm">
+            CC
+          </span>
+          <span className="hidden sm:block">Campus Connect</span>
         </Link>
         {companyLoading ? (
           <LoaderCircle className="animate-spin text-gray-500" />
@@ -132,7 +137,7 @@ const Dashboard = () => {
             <div className="relative">
               <button
                 onClick={() => setIsNotifOpen((prev) => !prev)}
-                className="relative p-2 rounded-full bg-white border border-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600 shadow-sm hover:shadow transition-all"
+                className="relative p-2 rounded-xl bg-white/70 border border-slate-200/70 text-slate-700 hover:bg-white hover:text-blue-700 shadow-sm hover:shadow transition-all ring-1 ring-slate-900/5"
                 aria-label="Notifications"
               >
                 <Bell size={18} />
@@ -144,14 +149,15 @@ const Dashboard = () => {
               </button>
 
               {isNotifOpen && (
-                <div className="absolute right-0 mt-3 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-50 overflow-hidden animate-fadeIn">
-                  <div className="p-3 border-b border-gray-100 flex items-center justify-between">
-                    <h3 className="text-sm font-semibold text-gray-700">
+                <div className="absolute right-0 mt-3 w-72 bg-white/80 backdrop-blur-xl border border-slate-200/70 rounded-2xl shadow-[0_22px_60px_-40px_rgba(15,23,42,0.75)] z-50 overflow-hidden ring-1 ring-slate-900/5 animate-fadeIn">
+                  <div className="h-[2px] w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 opacity-70" />
+                  <div className="p-3 border-b border-slate-200/60 flex items-center justify-between">
+                    <h3 className="text-sm font-extrabold tracking-tight text-slate-900">
                       Notifications
                     </h3>
                     <button
                       onClick={() => setIsNotifOpen(false)}
-                      className="text-gray-400 hover:text-gray-600 text-xs"
+                      className="text-slate-400 hover:text-slate-600 text-xs"
                     >
                       ✕
                     </button>
@@ -162,42 +168,42 @@ const Dashboard = () => {
                       notifcationAll.map((notif) => (
                         <li
                           key={notif._id}
-                          className="flex items-start gap-3 p-3 text-sm hover:bg-gray-50 cursor-pointer border-b last:border-b-0 border-gray-100"
+                          className="flex items-start gap-3 p-3 text-sm hover:bg-white/60 cursor-pointer border-b last:border-b-0 border-slate-200/60"
                         >
                           <img
                             src={
                               notif?.userId?.image || assets.avatarPlaceholder
                             }
                             alt={notif?.userId?.name || "User"}
-                            className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                            className="w-8 h-8 rounded-2xl object-cover flex-shrink-0 ring-1 ring-slate-900/10"
                           />
                           <div className="flex flex-col">
-                            <span className="font-medium text-gray-800">
+                            <span className="font-semibold text-slate-900">
                               {notif?.userId?.name}
                             </span>
-                            <p className="text-gray-600 text-xs leading-snug">
+                            <p className="text-slate-600 text-xs leading-snug">
                               {notif?.message}
                             </p>
                           </div>
                         </li>
                       ))
                     ) : (
-                      <li className="p-3 text-sm text-gray-500 text-center">
+                      <li className="p-3 text-sm text-slate-500 text-center">
                         No notifications found.
                       </li>
                     )}
                   </ul>
 
-                  <div className="flex items-center justify-between p-2 border-t border-gray-100">
+                  <div className="flex items-center justify-between p-2 border-t border-slate-200/60">
                     <button
                       onClick={()=>handleClearNotifications("all")}
-                      className="text-xs text-red-500 hover:underline"
+                      className="text-xs text-rose-600 hover:underline font-semibold"
                     >
                       Clear All
                     </button>
                     <button
                       onClick={() => navigate("/notifications")}
-                      className="text-xs text-blue-600 hover:underline"
+                      className="text-xs text-blue-700 hover:underline font-semibold"
                     >
                       View All
                     </button>
@@ -207,36 +213,37 @@ const Dashboard = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <p className="text-gray-600 font-bold">Hi, {companyData?.name}</p>
+              <p className="text-slate-700 font-bold hidden sm:block">Hi, {companyData?.name}</p>
               <img
-                className="w-8 h-8 rounded-full object-cover"
+                className="w-9 h-9 rounded-2xl object-cover ring-1 ring-slate-900/10"
                 src={companyData?.image}
                 alt={`${companyData?.name}'s profile`}
               />
             </div>
             <button
-              className="w-[30px] h-[30px] flex items-center justify-center rounded bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors cursor-pointer"
+              className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/70 border border-slate-200/70 hover:bg-white transition-colors cursor-pointer ring-1 ring-slate-900/5"
               onClick={handleLogout}
               aria-label="Logout"
             >
-              <LogOut size={18} className="text-gray-700" />
+              <LogOut size={18} className="text-slate-700" />
             </button>
           </div>
         ) : null}
+        </div>
       </header>
 
       <div className="flex flex-1">
-        <aside className="md:w-64 w-16 border-r border-gray-200 bg-white flex flex-col shrink-0">
-          <nav className="pt-4 rounded-l-2xl">
+        <aside className="md:w-64 w-16 border-r border-slate-200/60 bg-white/70 backdrop-blur-xl flex flex-col shrink-0">
+          <nav className="p-3 space-y-2">
             {sidebarLinks.map((item) => (
               <NavLink
                 to={item.path}
                 key={item.id}
                 className={({ isActive }) =>
-                  `flex items-center py-3 px-4 gap-3 transition-colors rounded-l-md ${
+                  `flex items-center py-3 px-3 gap-3 transition-all rounded-2xl ring-1 ring-transparent hover:ring-slate-900/5 hover:bg-white/60 ${
                     isActive
-                      ? "border-r-4 md:border-r-[6px] bg-indigo-50 border-indigo-500 text-indigo-600 font-medium"
-                      : "text-gray-600"
+                      ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm"
+                      : "text-slate-700"
                   }`
                 }
                 end={item.path === "/dashboard/manage-jobs"}
@@ -253,7 +260,7 @@ const Dashboard = () => {
           </nav>
         </aside>
 
-        <main className="flex-1 overflow-auto pl-4 pt-4">
+        <main className="flex-1 overflow-auto p-4 md:p-6">
           <Outlet />
         </main>
       </div>

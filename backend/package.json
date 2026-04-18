@@ -4,8 +4,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon app.js",
-    "dev": "nodemon app.js",
+    "start": "node ./node_modules/nodemon/bin/nodemon.js app.js",
+    "dev": "node ./node_modules/nodemon/bin/nodemon.js app.js",
     "build": "echo 'No build step required'"
   },
   "keywords": [],

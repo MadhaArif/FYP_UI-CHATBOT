@@ -48,30 +48,71 @@ const RecruiterLogin = () => {
     <>
       {/* <Navbar /> */}
       <div className="min-h-screen flex flex-col">
-        <main className="grow flex items-center justify-center px-4 py-8">
-          <div className="w-full max-w-md">
-            {/* Header Card */}
-            <div className="text-center mb-8">
-              <div className="flex justify-center mb-4">
-                <div className="relative">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-                    <Building2 className="w-8 h-8 text-white" />
+        <main className="grow flex items-center justify-center px-4 py-10 relative">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 h-64 w-[80%] rounded-full bg-gradient-to-r from-blue-500/10 via-indigo-500/8 to-purple-500/10 blur-3xl" />
+            <div className="absolute top-40 -left-24 h-72 w-72 rounded-full bg-indigo-500/8 blur-3xl" />
+            <div className="absolute bottom-10 -right-24 h-72 w-72 rounded-full bg-blue-500/8 blur-3xl" />
+          </div>
+
+          <div className="w-full max-w-5xl relative">
+            <div className="grid lg:grid-cols-2 gap-10 items-stretch">
+              <div className="hidden lg:flex relative overflow-hidden rounded-3xl p-10 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white shadow-[0_26px_70px_-45px_rgba(15,23,42,0.85)]">
+                <div className="pointer-events-none absolute -top-20 -left-20 h-64 w-64 rounded-full bg-white/15 blur-2xl" />
+                <div className="pointer-events-none absolute -bottom-28 -right-24 h-72 w-72 rounded-full bg-white/10 blur-2xl" />
+                <div className="flex flex-col justify-between w-full">
+                  <div>
+                    <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold ring-1 ring-white/20">
+                      <Building2 className="w-4 h-4" />
+                      Recruiter Portal
+                    </div>
+                    <h2 className="mt-6 text-4xl font-extrabold tracking-tight leading-tight">
+                      Hire faster with a clean dashboard.
+                    </h2>
+                    <p className="mt-4 text-white/85 leading-relaxed">
+                      Sign in to post jobs, review candidates, and manage applications with ease.
+                    </p>
                   </div>
-                  <div className="absolute -inset-2 bg-blue-500/20 rounded-2xl blur-lg opacity-0 animate-pulse"></div>
+
+                  <div className="mt-10 grid gap-3 text-sm text-white/90">
+                    <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
+                      <div className="h-2 w-2 rounded-full bg-white" />
+                      Post jobs & manage listings
+                    </div>
+                    <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
+                      <div className="h-2 w-2 rounded-full bg-white" />
+                      Track applicants & shortlist easily
+                    </div>
+                    <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
+                      <div className="h-2 w-2 rounded-full bg-white" />
+                      Secure company access
+                    </div>
+                  </div>
                 </div>
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
-                Recruiter Login
-              </h1>
-              <p className="text-gray-600 text-sm">
-                Welcome back! Access your recruitment dashboard
-              </p>
-            </div>
 
-            {/* Login Card */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/60 overflow-hidden">
-              <div className="p-8">
-                <form className="space-y-6" onSubmit={recruiterLogin}>
+              <div className="flex items-center">
+                <div className="w-full max-w-md mx-auto">
+                  <div className="text-center mb-8">
+                    <div className="flex justify-center mb-4">
+                      <div className="relative">
+                        <div className="w-16 h-16 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                          <Building2 className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="absolute -inset-2 bg-blue-500/20 rounded-2xl blur-lg opacity-60"></div>
+                      </div>
+                    </div>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
+                      Recruiter Login
+                    </h1>
+                    <p className="text-slate-600 text-sm">
+                      Welcome back! Access your recruitment dashboard
+                    </p>
+                  </div>
+
+                  <div className="bg-white/75 backdrop-blur-xl rounded-2xl shadow-[0_22px_60px_-40px_rgba(15,23,42,0.75)] border border-slate-200/60 ring-1 ring-slate-900/5 overflow-hidden">
+                    <div className="p-8">
+                      <form className="space-y-6" onSubmit={recruiterLogin}>
                   {/* Email Field */}
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -190,14 +231,16 @@ const RecruiterLogin = () => {
                     </p>
                   </div>
                 </form>
-              </div>
-            </div>
+                    </div>
+                  </div>
 
-            {/* Additional Info */}
-            <div className="text-center mt-6">
-              <p className="text-xs text-gray-500">
-                Secure login with enterprise-grade encryption
-              </p>
+                  <div className="text-center mt-6">
+                    <p className="text-xs text-slate-500">
+                      Secure login with enterprise-grade encryption
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </main>

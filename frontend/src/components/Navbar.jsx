@@ -21,7 +21,7 @@ const Navbar = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
-  const { isLogin, userData, userDataLoading, setIsLogin } =
+  const { isLogin, userData, userDataLoading, setIsLogin, setUserToken, setUserData } =
     useContext(AppContext);
   const location = useLocation();
 
@@ -71,9 +71,11 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("userToken");
+    setUserToken(null);
+    setUserData(null);
+    setIsLogin(false);
     toast.success("Logout successfully");
     navigate("/candidate-login");
-    setIsLogin(false);
   };
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -81,23 +83,25 @@ const Navbar = () => {
   }, [location.pathname]);
 
   return (
-    <header className="border-b border-gray-200 mb-10 shadow-md bg-gradient-to-r from-blue-50 to-indigo-50 sticky top-0 z-50">
+    <header className="sticky top-0 z-50 mb-10 bg-transparent">
       {/* Wrapper ensures spacing across all screen sizes */}
-      <div className="max-w-7xl mx-auto w-full px-5 sm:px-8 md:px-10">
-        <nav className="flex items-center justify-between h-20">
+      <div className="max-w-7xl mx-auto w-full px-5 sm:px-8 md:px-10 py-4">
+        <div className="rounded-2xl bg-white/80 backdrop-blur-xl border border-slate-200/60 shadow-[0_18px_45px_-30px_rgba(15,23,42,0.55)] ring-1 ring-slate-900/5 overflow-hidden">
+          <div className="h-[2px] w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600" />
+          <nav className="flex items-center justify-between h-16 px-4 sm:px-6">
           {/* Enhanced Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="relative">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-blue-500/25 transition-all duration-300 group-hover:scale-105">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:scale-105">
                 <GraduationCap className="w-5 h-5 text-white" />
               </div>
               <div className="absolute -inset-1 bg-blue-500/20 rounded-xl blur-sm group-hover:blur-md transition-all duration-300 opacity-0 group-hover:opacity-100"></div>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="text-lg sm:text-xl font-extrabold tracking-tight text-slate-900">
                 CampusConnect
               </span>
-              <span className="text-[10px] text-gray-500 font-medium -mt-1">
+              <span className="text-[10px] text-slate-500 font-semibold -mt-1">
                 Your Career Gateway
               </span>
             </div>
@@ -106,15 +110,15 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="flex items-center gap-6">
             {/* Navigation Menu */}
-            <ul className="hidden lg:flex items-center gap-6">
+            <ul className="hidden lg:flex items-center gap-1 p-1 rounded-full bg-slate-50/80 border border-slate-200/70">
               {menu.map((item) => (
                 <li key={item.path}>
                   <NavLink
                     to={item.path}
                     className={({ isActive }) =>
-                      `px-4 py-2 rounded-md text-sm font-medium transition-colors ${isActive
-                        ? "text-blue-600 bg-blue-100 shadow-sm"
-                        : "text-gray-700 hover:text-blue-600 hover:bg-blue-50"
+                      `px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 focus:outline-none ${isActive
+                        ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-sm"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-white/70"
                       }`
                     }
                   >
@@ -133,15 +137,22 @@ const Navbar = () => {
                 ref={profileMenuRef}
               >
                 <button
+                  onClick={handleLogout}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/70 border border-slate-200/70 hover:bg-white transition-colors cursor-pointer ring-1 ring-slate-900/5"
+                  aria-label="Logout"
+                >
+                  <LogOut size={18} className="text-slate-700" />
+                </button>
+                <button
                   onClick={toggleProfileMenu}
-                  className="flex items-center gap-2 focus:outline-none bg-white px-3 py-2 rounded-full shadow-sm border border-gray-100 hover:shadow-md transition-all"
+                  className="flex items-center gap-2 focus:outline-none bg-white/70 px-3 py-2 rounded-full shadow-sm border border-slate-200/70 ring-1 ring-slate-900/5 hover:shadow-md hover:bg-white transition-all"
                   aria-expanded={isProfileMenuOpen}
                 >
                   <span className="text-sm font-medium text-gray-700">
                     Hi, {userData?.name || "User"}
                   </span>
                   <img
-                    className="w-8 h-8 rounded-full object-cover border-2 border-blue-100"
+                    className="w-8 h-8 rounded-full object-cover ring-2 ring-blue-500/15"
                     src={userData?.image || assets.avatarPlaceholder}
                     alt="User profile"
                     onError={(e) => {
@@ -156,18 +167,18 @@ const Navbar = () => {
                 </button>
 
                 {isProfileMenuOpen && (
-                  <div className="absolute right-0 top-12 mt-2 w-56 origin-top-right rounded-md border border-gray-200 bg-white z-50 overflow-hidden">
+                  <div className="absolute right-0 top-12 mt-2 w-56 origin-top-right rounded-2xl border border-white/50 bg-white/80 backdrop-blur-xl z-50 overflow-hidden shadow-[0_20px_60px_-25px_rgba(15,23,42,0.45)] ring-1 ring-slate-900/5">
                     <div>
                       <Link
                         to="/applied-applications"
-                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
+                        className="flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-white/70 gap-2"
                       >
                         <Briefcase size={16} />
                         My profile
                       </Link>
 
                       <button
-                        className="w-full text-left flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 gap-2"
+                        className="w-full text-left flex items-center px-4 py-2.5 text-sm text-slate-700 hover:bg-white/70 gap-2"
                         onClick={handleLogout}
                       >
                         <LogOut size={16} />
@@ -181,13 +192,13 @@ const Navbar = () => {
               <div className="hidden lg:flex items-center gap-4">
                 <Link
                   to="/recruiter-login"
-                  className="bg-white text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-50 transition-all shadow-sm border border-blue-100 hover:shadow"
+                  className="bg-white/70 text-slate-900 px-4 py-2 rounded-full text-sm font-semibold hover:bg-white transition-all border border-slate-200/70 ring-1 ring-slate-900/5 hover:shadow-sm"
                 >
                   Recruiter Login
                 </Link>
                 <Link
                   to="/candidate-login"
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-md text-sm hover:from-blue-700 hover:to-indigo-700 transition-all font-medium shadow-md hover:shadow-lg"
+                  className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-sm hover:shadow-md transition-all hover:brightness-105"
                 >
                   Candidate Login
                 </Link>
@@ -199,12 +210,13 @@ const Navbar = () => {
               aria-label="Toggle menu"
               aria-expanded={isMobileMenuOpen}
               onClick={toggleMenu}
-              className="lg:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
+              className="lg:hidden p-2 rounded-xl text-slate-800 hover:bg-slate-100/70 focus:outline-none ring-1 ring-slate-900/5"
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
-        </nav>
+          </nav>
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -214,21 +226,21 @@ const Navbar = () => {
         ref={mobileMenuRef}
       >
         <div
-          className="fixed inset-0 backdrop-blur-sm bg-blue-900/20"
+          className="fixed inset-0 backdrop-blur-sm bg-slate-900/20"
           onClick={toggleMenu}
         />
-        <div className="relative flex flex-col w-4/5 max-w-sm h-full bg-white border-r border-r-gray-200 shadow-xl">
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="relative flex flex-col w-4/5 max-w-sm h-full bg-white/85 backdrop-blur-xl border-r border-r-slate-200/60 shadow-[0_30px_80px_-35px_rgba(15,23,42,0.6)] ring-1 ring-slate-900/5">
+          <div className="flex items-center justify-between p-4 border-b border-slate-200/60">
             <Link
               to="/"
               onClick={toggleMenu}
-              className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
+              className="text-xl font-extrabold tracking-tight text-slate-900"
             >
               CampusConnect
             </Link>
             <button
               onClick={toggleMenu}
-              className="p-2 rounded-full text-blue-600 hover:bg-white/80 transition-colors"
+              className="p-2 rounded-xl text-slate-800 hover:bg-slate-100/70 transition-colors ring-1 ring-slate-900/5"
               aria-label="Close menu"
             >
               <X size={20} />
@@ -243,9 +255,9 @@ const Navbar = () => {
                     to={item.path}
                     onClick={toggleMenu}
                     className={({ isActive }) =>
-                      `block px-4 py-3 rounded-md text-sm font-medium ${isActive
-                        ? "bg-blue-100 text-blue-600 shadow-sm"
-                        : "text-gray-700 hover:bg-blue-50"
+                      `block px-4 py-3 rounded-2xl text-sm font-semibold transition-all ${isActive
+                        ? "bg-slate-900 text-white shadow-sm"
+                        : "text-slate-700 hover:bg-slate-100/70"
                       }`
                     }
                   >
@@ -256,12 +268,12 @@ const Navbar = () => {
             </ul>
 
             {userDataLoading ? (
-              <LoaderCircle className="animate-spin text-gray-600 hidden lg:block" />
+              <LoaderCircle className="animate-spin text-gray-600" />
             ) : isLogin ? (
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <div className="flex items-center gap-3 mb-4">
                   <img
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-blue-500/15"
                     src={userData?.image || assets.avatarPlaceholder}
                     alt="User profile"
                     onError={(e) => {
@@ -280,7 +292,7 @@ const Navbar = () => {
                     <Link
                       to="/applied-jobs"
                       onClick={toggleMenu}
-                      className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-white/70"
                     >
                       <Briefcase size={16} />
                       Applied Jobs
@@ -289,7 +301,7 @@ const Navbar = () => {
                   <li>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 cursor-pointer"
+                      className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-white/70 cursor-pointer"
                     >
                       <LogOut size={16} />
                       Logout
@@ -302,14 +314,14 @@ const Navbar = () => {
                 <Link
                   to="/recruiter-login"
                   onClick={toggleMenu}
-                  className="block w-full bg-blue-50 text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-100 text-center"
+                  className="block w-full bg-white/70 text-slate-900 px-4 py-2 rounded-2xl text-sm font-semibold hover:bg-white text-center ring-1 ring-slate-900/5 border border-slate-200/70"
                 >
                   Recruiter Login
                 </Link>
                 <Link
                   to="/candidate-login"
                   onClick={toggleMenu}
-                  className="block w-full bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 text-center cursor-pointer"
+                  className="block w-full bg-slate-900 text-white px-4 py-2 rounded-2xl text-sm font-semibold hover:shadow-md text-center cursor-pointer shadow-sm"
                 >
                   Candidate Login
                 </Link>

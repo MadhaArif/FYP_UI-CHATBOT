@@ -156,32 +156,60 @@ function AllJobs() {
   return (
     <>
       {/* <Navbar /> */}
-      <section>
-        <div className="md:hidden flex justify-end mb-4">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-          >
-            <Filter size={18} />
-            {showFilters ? "Hide Filters" : "Show Filters"}
-          </button>
+      <section className="relative">
+        <div className="pointer-events-none absolute -top-16 left-1/2 -translate-x-1/2 h-56 w-[90%] rounded-full bg-gradient-to-r from-blue-500/10 via-indigo-500/8 to-purple-500/10 blur-3xl" />
+
+        <div className="relative mb-8 overflow-hidden rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-xl ring-1 ring-slate-900/5 shadow-[0_22px_60px_-45px_rgba(15,23,42,0.75)]">
+          <div className="h-[2px] w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600" />
+          <div className="px-6 py-8 sm:px-10 sm:py-10">
+            <div className="flex items-start justify-between gap-4 flex-col sm:flex-row">
+              <div>
+                <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 capitalize">
+                  {category === "all"
+                    ? "All Jobs"
+                    : `Jobs in ${
+                        category.charAt(0).toUpperCase() + category.slice(1)
+                      }`}
+                </h1>
+                <p className="mt-2 text-slate-600">
+                  Get your desired job from top companies
+                  {filteredJobs.length > 0 && (
+                    <span className="ml-2 text-slate-500">
+                      • {filteredJobs.length}{" "}
+                      {filteredJobs.length === 1 ? "job" : "jobs"}
+                    </span>
+                  )}
+                </p>
+              </div>
+
+              <div className="md:hidden">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white px-4 py-2.5 rounded-xl font-semibold shadow-sm hover:shadow-md transition"
+                >
+                  <Filter size={18} />
+                  {showFilters ? "Hide Filters" : "Show Filters"}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <motion.div
           variants={slideRigth(0.5)}
           initial="hidden"
           animate="visible"
-          className="flex flex-col md:flex-row md:gap-8 lg:gap-16"
+          className="flex flex-col md:flex-row md:gap-8 lg:gap-10"
         >
           {/* Filters */}
           <div
-            className={`lg:w-1/4 p-4 rounded-lg border border-gray-200 ${
+            className={`md:w-[340px] lg:w-[360px] p-5 rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-xl ring-1 ring-slate-900/5 shadow-[0_18px_50px_-42px_rgba(15,23,42,0.7)] ${
               showFilters ? "block" : "hidden md:block"
             }`}
           >
             <div className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                <h2 className="text-sm font-extrabold tracking-wide text-slate-900 mb-2 uppercase">
                   Job Title
                 </h2>
                 <input
@@ -190,12 +218,12 @@ function AllJobs() {
                   value={searchInput.title}
                   onChange={handleSearchChange}
                   placeholder="Enter title"
-                  className="w-full border border-gray-300 rounded-md px-4 py-2"
+                  className="w-full border border-slate-200/70 bg-white rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                <h2 className="text-sm font-extrabold tracking-wide text-slate-900 mb-2 uppercase">
                   Job Location
                 </h2>
                 <input
@@ -204,12 +232,12 @@ function AllJobs() {
                   value={searchInput.location}
                   onChange={handleSearchChange}
                   placeholder="Enter location"
-                  className="w-full border border-gray-300 rounded-md px-4 py-2"
+                  className="w-full border border-slate-200/70 bg-white rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                <h2 className="text-sm font-extrabold tracking-wide text-slate-900 mb-2 uppercase">
                   Categories
                 </h2>
                 <ul className="space-y-2">
@@ -220,11 +248,11 @@ function AllJobs() {
                         id={`cat-${i}`}
                         checked={searchInput.selectedCategories.includes(cat)}
                         onChange={() => handleCategoryToggle(cat)}
-                        className="h-4 w-4"
+                        className="h-4 w-4 accent-blue-600"
                       />
                       <label
                         htmlFor={`cat-${i}`}
-                        className="ml-2 text-gray-700"
+                        className="ml-2 text-slate-700 text-sm"
                       >
                         {cat}
                       </label>
@@ -234,7 +262,7 @@ function AllJobs() {
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                <h2 className="text-sm font-extrabold tracking-wide text-slate-900 mb-2 uppercase">
                   Locations
                 </h2>
                 <ul className="space-y-2">
@@ -245,11 +273,11 @@ function AllJobs() {
                         id={`loc-${i}`}
                         checked={searchInput.selectedLocations.includes(loc)}
                         onChange={() => handleLocationToggle(loc)}
-                        className="h-4 w-4"
+                        className="h-4 w-4 accent-blue-600"
                       />
                       <label
                         htmlFor={`loc-${i}`}
-                        className="ml-2 text-gray-700"
+                        className="ml-2 text-slate-700 text-sm"
                       >
                         {loc}
                       </label>
@@ -257,30 +285,18 @@ function AllJobs() {
                   ))}
                 </ul>
               </div>
+
+              <button
+                onClick={clearAllFilters}
+                className="w-full rounded-xl border border-slate-200/70 bg-white/70 hover:bg-white text-slate-800 font-semibold py-2.5 text-sm transition"
+              >
+                Clear All Filters
+              </button>
             </div>
           </div>
 
           {/* Job Cards */}
-          <div className="lg:w-3/4">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-700 capitalize mb-2">
-                {category === "all"
-                  ? "Latest All Jobs"
-                  : `Jobs in ${
-                      category.charAt(0).toUpperCase() + category.slice(1)
-                    }`}
-                {filteredJobs.length > 0 && (
-                  <span className="ml-2 text-gray-500 text-lg">
-                    ({filteredJobs.length}{" "}
-                    {filteredJobs.length === 1 ? "job" : "jobs"})
-                  </span>
-                )}
-              </h1>
-              <p className="text-gray-600">
-                Get your desired job from top companies
-              </p>
-            </div>
-
+          <div className="flex-1">
             <motion.div
               variants={SlideUp(0.5)}
               initial="hidden"
@@ -290,16 +306,16 @@ function AllJobs() {
               {paginatedJobs.length > 0 ? (
                 paginatedJobs.map((job, i) => <JobCard key={i} job={job} />)
               ) : (
-                <div className="text-center bg-white p-6 border border-gray-200 rounded-md">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                <div className="text-center bg-white/70 backdrop-blur-xl p-8 border border-slate-200/60 ring-1 ring-slate-900/5 rounded-3xl shadow-[0_18px_50px_-42px_rgba(15,23,42,0.7)]">
+                  <h3 className="text-lg font-extrabold tracking-tight text-slate-900 mb-1">
                     No jobs found
                   </h3>
-                  <p className="text-gray-500 mb-3">
+                  <p className="text-slate-600 mb-4">
                     Try adjusting your search filters.
                   </p>
                   <button
                     onClick={clearAllFilters}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                    className="px-5 py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-xl font-semibold shadow-sm hover:shadow-md hover:brightness-105 transition"
                   >
                     Clear All Filters
                   </button>
@@ -314,7 +330,7 @@ function AllJobs() {
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={currentPage === 1}
-                  className="p-2 border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 text-gray-700"
+                  className="p-2 border border-slate-200/70 bg-white/70 rounded-xl hover:bg-white disabled:opacity-50 text-slate-700 transition"
                 >
                   <ChevronLeft size={20} />
                 </button>
@@ -323,10 +339,10 @@ function AllJobs() {
                   <button
                     key={i}
                     onClick={() => setCurrentPage(i + 1)}
-                    className={`w-10 h-10 rounded-md border text-center cursor-pointer ${
+                    className={`w-10 h-10 rounded-xl border text-center cursor-pointer transition ${
                       currentPage === i + 1
-                        ? "bg-blue-50 text-blue-500 border-blue-300"
-                        : "bg-white border-gray-300 text-gray-700 hover:bg-gray-100"
+                        ? "bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white border-transparent shadow-sm"
+                        : "bg-white/70 border-slate-200/70 text-slate-700 hover:bg-white"
                     }`}
                   >
                     {i + 1}
@@ -338,7 +354,7 @@ function AllJobs() {
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                   }
                   disabled={currentPage === totalPages}
-                  className="p-2 border border-gray-300 rounded-md hover:bg-gray-100 disabled:opacity-50 text-gray-700"
+                  className="p-2 border border-slate-200/70 bg-white/70 rounded-xl hover:bg-white disabled:opacity-50 text-slate-700 transition"
                 >
                   <ChevronRight size={20} />
                 </button>

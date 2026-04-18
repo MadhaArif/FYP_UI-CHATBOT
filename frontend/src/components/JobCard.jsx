@@ -15,18 +15,18 @@ const JobCard = ({ job }) => {
         navigate(`/apply-job/${job._id}`);
         scrollTo(0, 0);
       }}
-      className="flex gap-4 rounded-lg border border-gray-200 p-5 hover:shadow transition cursor-pointer"
+      className="flex gap-4 rounded-3xl border border-slate-200/60 bg-white/70 backdrop-blur-xl p-5 hover:shadow-md transition cursor-pointer ring-1 ring-slate-900/5"
     >
       <img
-        className="w-[50px] h-[50px] object-contain"
+        className="w-[50px] h-[50px] object-contain rounded-2xl ring-1 ring-slate-900/10 bg-white"
         src={job.companyId?.image || assets.company_icon}
         alt={`${job.companyId?.name || "Company"} Logo`}
       />
       <div className="flex-1">
-        <h1 className="text-xl text-gray-700 font-semibold mb-1">
+        <h1 className="text-xl text-slate-900 font-extrabold tracking-tight mb-1">
           {job.title}
         </h1>
-        <div className="flex flex-wrap items-center gap-4 text-gray-600 mt-3">
+        <div className="flex flex-wrap items-center gap-4 text-slate-600 mt-3 text-sm">
           <div className="flex items-center gap-2">
             <img src={assets.suitcase_icon} alt="Company" />
             <span>{job.companyId?.name || "Unknown Company"}</span>

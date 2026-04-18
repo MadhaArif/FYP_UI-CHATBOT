@@ -61,22 +61,75 @@ const RecruiterSignup = () => {
     <>
       {/* <Navbar /> */}
       <div className="flex flex-col min-h-screen">
-        <main className="flex-grow flex items-center justify-center">
-          <div className="w-full max-w-md border border-gray-200 rounded-lg p-6 bg-white shadow">
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-semibold text-gray-700 mb-1.5">
-                Recruiter Sign Up
-              </h1>
-              <p className="text-sm text-gray-600">
-                Welcome! Please create an account to continue
-              </p>
-            </div>
+        <main className="flex-grow flex items-center justify-center px-4 py-10 relative">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 h-64 w-[80%] rounded-full bg-gradient-to-r from-blue-500/10 via-indigo-500/8 to-purple-500/10 blur-3xl" />
+            <div className="absolute top-40 -left-24 h-72 w-72 rounded-full bg-indigo-500/8 blur-3xl" />
+            <div className="absolute bottom-10 -right-24 h-72 w-72 rounded-full bg-blue-500/8 blur-3xl" />
+          </div>
 
-            <form className="space-y-4" onSubmit={recruiterSignup}>
+          <div className="w-full max-w-5xl relative">
+            <div className="grid lg:grid-cols-2 gap-10 items-stretch">
+              <div className="hidden lg:flex relative overflow-hidden rounded-3xl p-10 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white shadow-[0_26px_70px_-45px_rgba(15,23,42,0.85)]">
+                <div className="pointer-events-none absolute -top-20 -left-20 h-64 w-64 rounded-full bg-white/15 blur-2xl" />
+                <div className="pointer-events-none absolute -bottom-28 -right-24 h-72 w-72 rounded-full bg-white/10 blur-2xl" />
+                <div className="flex flex-col justify-between w-full">
+                  <div>
+                    <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold ring-1 ring-white/20">
+                      <UserRound className="w-4 h-4" />
+                      Create company account
+                    </div>
+                    <h2 className="mt-6 text-4xl font-extrabold tracking-tight leading-tight">
+                      Build your hiring pipeline in minutes.
+                    </h2>
+                    <p className="mt-4 text-white/85 leading-relaxed">
+                      Create an account to post jobs, manage applicants, and hire smarter.
+                    </p>
+                  </div>
+
+                  <div className="mt-10 grid gap-3 text-sm text-white/90">
+                    <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
+                      <div className="h-2 w-2 rounded-full bg-white" />
+                      Company profile & branding
+                    </div>
+                    <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
+                      <div className="h-2 w-2 rounded-full bg-white" />
+                      Post jobs & manage listings
+                    </div>
+                    <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15">
+                      <div className="h-2 w-2 rounded-full bg-white" />
+                      Secure recruiter access
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center">
+                <div className="w-full max-w-md mx-auto">
+                  <div className="text-center mb-8">
+                    <div className="flex justify-center mb-4">
+                      <div className="relative">
+                        <div className="w-16 h-16 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                          <UserRound className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="absolute -inset-2 bg-blue-500/20 rounded-2xl blur-lg opacity-60"></div>
+                      </div>
+                    </div>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-2">
+                      Recruiter Sign Up
+                    </h1>
+                    <p className="text-slate-600 text-sm">
+                      Welcome! Please create an account to continue
+                    </p>
+                  </div>
+
+                  <div className="bg-white/75 backdrop-blur-xl rounded-2xl shadow-[0_22px_60px_-40px_rgba(15,23,42,0.75)] border border-slate-200/60 ring-1 ring-slate-900/5 overflow-hidden">
+                    <div className="p-8">
+                      <form className="space-y-5" onSubmit={recruiterSignup}>
               {/* Logo Upload */}
               <div className="flex flex-col items-center mb-4">
                 <label className="relative cursor-pointer flex items-center justify-between flex-col">
-                  <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300 hover:border-blue-500 transition-colors">
+                  <div className="w-20 h-20 rounded-2xl bg-white flex items-center justify-center overflow-hidden border border-slate-200/70 ring-1 ring-slate-900/5 shadow-sm hover:shadow-md transition-shadow">
                     {companyLogo ? (
                       <img
                         src={URL.createObjectURL(companyLogo)}
@@ -84,7 +137,7 @@ const RecruiterSignup = () => {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <Upload className="h-5 w-5 text-gray-400" />
+                      <Upload className="h-5 w-5 text-slate-400" />
                     )}
                     <input
                       type="file"
@@ -94,7 +147,7 @@ const RecruiterSignup = () => {
                       required
                     />
                   </div>
-                  <span className="block text-xs mt-2 text-gray-500">
+                  <span className="block text-xs mt-2 text-slate-500">
                     {companyLogo ? "Change logo" : "Upload company logo"}
                   </span>
                 </label>
@@ -102,47 +155,56 @@ const RecruiterSignup = () => {
 
               {/* Form Fields */}
               <div className="space-y-3">
-                <div className="border border-gray-300 rounded flex items-center p-2.5">
-                  <UserRound className="h-5 w-5 text-gray-400 mr-2" />
+                <div className="relative group">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 blur opacity-0 group-focus-within:opacity-20 transition-opacity" />
+                  <div className="relative border border-slate-200/70 bg-white rounded-xl flex items-center px-4 py-3.5">
+                  <UserRound className="h-5 w-5 text-slate-400 mr-2" />
                   <input
                     type="text"
                     placeholder="Company name"
-                    className="w-full outline-none text-sm bg-transparent"
+                    className="w-full outline-none text-sm bg-transparent placeholder-slate-400"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
                   />
                 </div>
+                </div>
 
-                <div className="border border-gray-300 rounded flex items-center p-2.5">
-                  <Mail className="h-5 w-5 text-gray-400 mr-2" />
+                <div className="relative group">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 blur opacity-0 group-focus-within:opacity-20 transition-opacity" />
+                  <div className="relative border border-slate-200/70 bg-white rounded-xl flex items-center px-4 py-3.5">
+                  <Mail className="h-5 w-5 text-slate-400 mr-2" />
                   <input
                     type="email"
                     placeholder="Email id"
-                    className="w-full outline-none text-sm bg-transparent"
+                    className="w-full outline-none text-sm bg-transparent placeholder-slate-400"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
+                </div>
 
-                <div className="border border-gray-300 rounded flex items-center p-2.5">
-                  <Lock className="h-5 w-5 text-gray-400 mr-2" />
+                <div className="relative group">
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 blur opacity-0 group-focus-within:opacity-20 transition-opacity" />
+                  <div className="relative border border-slate-200/70 bg-white rounded-xl flex items-center px-4 py-3.5">
+                  <Lock className="h-5 w-5 text-slate-400 mr-2" />
                   <input
                     type="password"
                     placeholder="Create password"
-                    className="w-full outline-none text-sm bg-transparent"
+                    className="w-full outline-none text-sm bg-transparent placeholder-slate-400"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
+                </div>
                 </div>
               </div>
 
               {/* Terms */}
               <label
                 htmlFor="terms-checkbox"
-                className="text-sm text-gray-600 flex items-center gap-2 cursor-pointer"
+                className="text-sm text-slate-600 flex items-center gap-2 cursor-pointer"
               >
                 <input
                   id="terms-checkbox"
@@ -151,7 +213,7 @@ const RecruiterSignup = () => {
                   required
                 />
                 I agree to the{" "}
-                <Link to="/terms" className="text-blue-600 hover:underline">
+                <Link to="/terms" className="text-blue-600 hover:underline font-semibold">
                   Terms and Conditions
                 </Link>
               </label>
@@ -160,18 +222,21 @@ const RecruiterSignup = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition flex justify-center items-center cursor-pointer ${
-                  loading ? "cursor-not-allowed opacity-50" : ""
+                className={`w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-3.5 px-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform transition-all duration-200 flex justify-center items-center gap-2 ${
+                  loading ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:brightness-105"
                 }`}
               >
                 {loading ? (
-                  <LoaderCircle className="animate-spin h-5 w-5" />
+                  <>
+                    <LoaderCircle className="animate-spin h-5 w-5" />
+                    <span>Creating...</span>
+                  </>
                 ) : (
                   "Create Account"
                 )}
               </button>
 
-              <div className="text-center text-sm text-gray-600 pt-2">
+              <div className="text-center text-sm text-slate-600 pt-2">
                 Already have an account?{" "}
                 <Link
                   to="/recruiter-login"
@@ -181,6 +246,17 @@ const RecruiterSignup = () => {
                 </Link>
               </div>
             </form>
+                    </div>
+                  </div>
+
+                  <div className="text-center mt-6">
+                    <p className="text-xs text-slate-500">
+                      Create company account • Secure & encrypted
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </main>
         {/* <Footer /> */}

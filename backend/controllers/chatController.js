@@ -44,16 +44,17 @@ GUIDELINES:
 6. Avoid repeating disclaimers or previously given information across turns unless requested.
 7. Use recent conversation context only to understand pronouns or references, but do not merge topics.
 8. Use the system data as your primary source of truth for jobs and companies.
+9. Do NOT repeat the user's question, do NOT include chat history, and do NOT add anything extra that the user didn't ask for.
+10. Do NOT greet unless the user greets you first. Do NOT ask follow-up questions unless the user asks for suggestions/options.
+11. Reply in the same language as the user's latest message. If the user uses Roman Urdu / Urdu-English mix, respond in the same style.
 
 STYLE:
-- Greet once per session; avoid repeating "nice to meet you" in later turns.
 - Keep replies concise: max 2 short paragraphs or up to 4 bullets.
 - Personalize with the user's name if they share it.
 - Use a simple Urdu-English mix when helpful, but keep it clear and professional.
 
 WHEN ASKED ABOUT GOOGLE/INTERNET ACCESS:
-- Respond politely and briefly: "Mere paas direct Google search nahi hai, lekin main Campus Connect ke data se jobs, companies aur resume tips mein madad kar sakta hoon."
-- Immediately offer options: "Jobs dekhni hain, companies info, ya resume tips?"
+- Respond politely and briefly: "Mere paas direct Google search nahi hai."
 `;
 
     const openai = new OpenAI({
@@ -66,13 +67,17 @@ WHEN ASKED ABOUT GOOGLE/INTERNET ACCESS:
     });
 
     // Construct messages with trimmed recent history to avoid topic-mixing
-    const recentHistory = history.slice(-4); // keep at most the last 4 entries
+    const recentHistory = Array.isArray(history) ? history.slice(-4) : []; // keep at most the last 4 entries
+    const historyMessages = [];
+
+    for (const h of recentHistory) {
+      if (h?.user) historyMessages.push({ role: "user", content: String(h.user) });
+      if (h?.bot) historyMessages.push({ role: "assistant", content: String(h.bot) });
+    }
+
     const messages = [
       { role: "system", content: systemContext },
-      ...recentHistory.map(h => ({
-        role: h.user ? "user" : "assistant",
-        content: h.user || h.bot
-      })),
+      ...historyMessages,
       { role: "user", content: message }
     ];
 
@@ -83,7 +88,16 @@ WHEN ASKED ABOUT GOOGLE/INTERNET ACCESS:
     });
     console.log("✅ Received reply from OpenRouter.");
 
-    const reply = completion.choices[0].message.content;
+    let reply = completion.choices?.[0]?.message?.content ?? "";
+    reply = String(reply).trim();
+
+    if (/(^|\n)\s*(user|human|customer)\s*:/i.test(reply)) {
+      const lines = reply.split(/\r?\n/);
+      reply = lines.filter((l) => !/^\s*(user|human|customer)\s*:/i.test(l)).join("\n").trim();
+    }
+
+    const assistantMarkerMatch = reply.match(/(?:^|\n)\s*(assistant|bot)\s*:\s*([\s\S]*)/i);
+    if (assistantMarkerMatch) reply = assistantMarkerMatch[2].trim();
 
     console.log("✅ Natural Chatbot Success Response generated");
     res.json({
