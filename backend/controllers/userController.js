@@ -21,7 +21,28 @@ export const registerUser = async (req, res) => {
     if (existingUser)
       return res.json({ success: false, message: "User already exists" });
 
-    const imageUpload = await cloudinary.uploader.upload(imageFile.path);
+    const hasCloudinary =
+      process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET;
+
+    if (!hasCloudinary) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "Image upload is not configured. Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in the backend environment variables.",
+      });
+    }
+
+    let imageUpload;
+    try {
+      imageUpload = await cloudinary.uploader.upload(imageFile.path);
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: "Profile image upload failed. Please try a smaller image.",
+      });
+    }
 
     // ⚠️ Don’t hash password here, let model pre-save do it
     const user = await User.create({
@@ -161,6 +182,19 @@ export const uploadResume = async (req, res) => {
     const userId = req.userData._id;
     const file = req.file;
     if (!file) return res.status(400).json({ success: false, message: "Resume file required" });
+
+    const hasCloudinary =
+      process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET;
+
+    if (!hasCloudinary) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "File upload is not configured. Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in the backend environment variables.",
+      });
+    }
 
     const uploaded = await cloudinary.uploader.upload(file.path);
     const user = await User.findByIdAndUpdate(userId, { resume: uploaded.secure_url }, { new: true });

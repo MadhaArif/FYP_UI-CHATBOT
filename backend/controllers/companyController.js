@@ -17,7 +17,28 @@ export const registerCompany = async (req, res) => {
     if (await Company.findOne({ email }))
       return res.status(409).json({ success: false, message: "Company already exists" });
 
-    const logo = await cloudinary.uploader.upload(image.path);
+    const hasCloudinary =
+      process.env.CLOUDINARY_CLOUD_NAME &&
+      process.env.CLOUDINARY_API_KEY &&
+      process.env.CLOUDINARY_API_SECRET;
+
+    if (!hasCloudinary) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "Image upload is not configured. Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET in the backend environment variables.",
+      });
+    }
+
+    let logo;
+    try {
+      logo = await cloudinary.uploader.upload(image.path);
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: "Company logo upload failed. Please try a smaller image.",
+      });
+    }
 
     const company = await Company.create({
       name,
@@ -29,6 +50,7 @@ export const registerCompany = async (req, res) => {
     const token = generateToken(company._id);
     res.status(201).json({ success: true, company, token });
   } catch (error) {
+    console.error("Company registration failed:", error?.message || error);
     res.status(500).json({ success: false, message: "Registration failed" });
   }
 };
