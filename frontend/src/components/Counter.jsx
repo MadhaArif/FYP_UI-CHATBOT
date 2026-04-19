@@ -137,6 +137,7 @@ const Counter = () => {
         <div className="text-center p-4 rounded-2xl bg-white/60 border border-slate-200/60 ring-1 ring-slate-900/5">
           <div className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-1">
             <CountUp
+              key={`active-${activeUsersMetric.end}-${activeUsersMetric.decimals}-${activeUsersMetric.suffix}`}
               start={0}
               end={activeUsersMetric.end}
               duration={1.4}
@@ -155,6 +156,7 @@ const Counter = () => {
         <div className="text-center p-4 rounded-2xl bg-white/60 border border-slate-200/60 ring-1 ring-slate-900/5">
           <div className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-1">
             <CountUp
+              key={`jobs-${openJobsMetric.end}-${openJobsMetric.decimals}-${openJobsMetric.suffix}`}
               start={0}
               end={openJobsMetric.end}
               duration={1.4}
@@ -173,6 +175,7 @@ const Counter = () => {
         <div className="text-center p-4 rounded-2xl bg-white/60 border border-slate-200/60 ring-1 ring-slate-900/5">
           <div className="text-4xl font-extrabold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-1">
             <CountUp
+              key={`partners-${partnersMetric.end}-${partnersMetric.decimals}-${partnersMetric.suffix}`}
               start={0}
               end={partnersMetric.end}
               duration={1.4}
