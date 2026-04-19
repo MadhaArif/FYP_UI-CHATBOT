@@ -48,7 +48,13 @@ export const registerCompany = async (req, res) => {
     });
 
     const token = generateToken(company._id);
-    res.status(201).json({ success: true, company, token });
+    res.status(201).json({
+      success: true,
+      message: "Registration successful",
+      companyData: company,
+      company,
+      token,
+    });
   } catch (error) {
     console.error("Company registration failed:", error?.message || error);
     res.status(500).json({ success: false, message: "Registration failed" });
@@ -66,7 +72,13 @@ export const loginCompany = async (req, res) => {
     if (!match) return res.status(401).json({ success: false, message: "Invalid password" });
 
     const token = generateToken(company._id);
-    res.json({ success: true, message: "Login successful", company, token });
+    res.json({
+      success: true,
+      message: "Login successful",
+      companyData: company,
+      company,
+      token,
+    });
   } catch {
     res.status(500).json({ success: false, message: "Login failed" });
   }
