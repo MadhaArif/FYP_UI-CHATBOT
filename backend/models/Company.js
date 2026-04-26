@@ -10,6 +10,9 @@ const companySchema = new mongoose.Schema(
     description: { type: String, default: "" },
     website: { type: String, default: "" },
     location: { type: String, default: "" },
+    isVerified: { type: Boolean, default: false },
+    emailOtpHash: { type: String, default: "" },
+    emailOtpExpiresAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

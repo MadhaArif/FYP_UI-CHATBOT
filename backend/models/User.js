@@ -10,6 +10,9 @@ const userSchema = new mongoose.Schema(
     resume: { type: String, default: "" },
     skills: [{ type: String, trim: true }],
     bio: { type: String, trim: true },
+    isVerified: { type: Boolean, default: false },
+    emailOtpHash: { type: String, default: "" },
+    emailOtpExpiresAt: { type: Date, default: null },
     role: {
       type: String,
       enum: ["TalentSeeker", "TalentFinder"],

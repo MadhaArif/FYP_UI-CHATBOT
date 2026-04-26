@@ -13,6 +13,9 @@ const RecruiterSignup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState("form");
+  const [otp, setOtp] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
 
   const { backendUrl, setCompanyData, setCompanyToken } =
     useContext(AppContext);
@@ -40,10 +43,16 @@ const RecruiterSignup = () => {
       );
 
       if (data.success) {
+        toast.success(data.message);
+        if (data.requiresVerification) {
+          setPendingEmail(email);
+          setStep("verify");
+          return;
+        }
+
         setCompanyToken(data.token);
         setCompanyData(data.companyData);
         localStorage.setItem("companyToken", data.token);
-        toast.success(data.message);
         navigate("/dashboard");
       } else {
         toast.error(data.message);
@@ -52,6 +61,51 @@ const RecruiterSignup = () => {
       console.log("Signup successful:", data);
     } catch (error) {
       toast.error(error?.response?.data?.message || "Signup failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyOtp = async (e) => {
+    e.preventDefault();
+    const cleanedOtp = otp.trim();
+    if (!cleanedOtp) return toast.error("OTP required");
+
+    setLoading(true);
+    try {
+      const { data } = await axios.post(`${backendUrl}/company/verify-email`, {
+        email: pendingEmail,
+        otp: cleanedOtp,
+      });
+
+      if (data.success) {
+        setCompanyToken(data.token);
+        setCompanyData(data.companyData);
+        localStorage.setItem("companyToken", data.token);
+        toast.success(data.message);
+        navigate("/dashboard");
+      } else {
+        toast.error(data.message || "OTP verification failed");
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "OTP verification failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resendOtp = async () => {
+    if (!pendingEmail) return toast.error("Email missing");
+    setLoading(true);
+    try {
+      const { data } = await axios.post(`${backendUrl}/company/resend-otp`, {
+        email: pendingEmail,
+      });
+
+      if (data.success) toast.success(data.message);
+      else toast.error(data.message || "Failed to resend OTP");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to resend OTP");
     } finally {
       setLoading(false);
     }
@@ -125,7 +179,78 @@ const RecruiterSignup = () => {
 
                   <div className="bg-white/75 backdrop-blur-xl rounded-2xl shadow-[0_22px_60px_-40px_rgba(15,23,42,0.75)] border border-slate-200/60 ring-1 ring-slate-900/5 overflow-hidden">
                     <div className="p-8">
-                      <form className="space-y-5" onSubmit={recruiterSignup}>
+                      {step === "verify" ? (
+                        <form className="space-y-5" onSubmit={verifyOtp}>
+                          <div className="text-center">
+                            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">
+                              Verify company email
+                            </h2>
+                            <p className="mt-2 text-sm text-slate-600">
+                              OTP bheja gaya hai: <span className="font-semibold text-slate-800">{pendingEmail}</span>
+                            </p>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                              <Lock className="w-4 h-4" />
+                              Enter OTP
+                            </label>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={otp}
+                              onChange={(e) => setOtp(e.target.value)}
+                              placeholder="6-digit OTP"
+                              className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm placeholder-gray-400"
+                              required
+                            />
+                          </div>
+
+                          <button
+                            type="submit"
+                            disabled={loading}
+                            className={`w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white py-3.5 px-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform transition-all duration-200 flex justify-center items-center gap-2 ${
+                              loading ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:brightness-105"
+                            }`}
+                          >
+                            {loading ? (
+                              <>
+                                <LoaderCircle className="animate-spin h-5 w-5" />
+                                <span>Verifying...</span>
+                              </>
+                            ) : (
+                              "Verify OTP"
+                            )}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={resendOtp}
+                            disabled={loading}
+                            className={`w-full border border-slate-200 bg-white text-slate-800 py-3.5 px-4 rounded-xl font-semibold shadow-sm hover:shadow transition-all duration-200 ${
+                              loading ? "cursor-not-allowed opacity-50" : "hover:bg-slate-50"
+                            }`}
+                          >
+                            Resend OTP
+                          </button>
+
+                          <div className="text-center text-sm text-slate-600 pt-2">
+                            Wrong email?{" "}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setStep("form");
+                                setOtp("");
+                                setPendingEmail("");
+                              }}
+                              className="text-blue-600 hover:text-blue-800 font-semibold hover:underline"
+                            >
+                              Go back
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <form className="space-y-5" onSubmit={recruiterSignup}>
               {/* Logo Upload */}
               <div className="flex flex-col items-center mb-4">
                 <label className="relative cursor-pointer flex items-center justify-between flex-col">
@@ -246,6 +371,7 @@ const RecruiterSignup = () => {
                 </Link>
               </div>
             </form>
+                      )}
                     </div>
                   </div>
 

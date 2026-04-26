@@ -4,6 +4,8 @@ import companyAuthMiddleware from "../middlewares/companyAuthMiddleware.js";
 import {
   registerCompany,
   loginCompany,
+  verifyCompanyEmailOtp,
+  resendCompanyEmailOtp,
   postJob,
   getCompanyPostedAllJobs,
   getCompanyJobApplicants,
@@ -16,6 +18,8 @@ import {
 const router = express.Router();
 
 router.post("/register-company", upload.single("image"), registerCompany);
+router.post("/verify-email", verifyCompanyEmailOtp);
+router.post("/resend-otp", resendCompanyEmailOtp);
 router.post("/login-company", loginCompany);
 router.get("/company-data", companyAuthMiddleware, fetchCompanyData);
 router.post("/post-job", companyAuthMiddleware, postJob);

@@ -1,10 +1,92 @@
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
+import crypto from "crypto";
+import nodemailer from "nodemailer";
 import Company from "../models/Company.js";
 import Job from "../models/Job.js";
 import JobApplication from "../models/JobApplication.js";
 import generateToken from "../src/utils/generateToken.js";
 import Notification from "../models/Notification.js";
+
+const OTP_TTL_MS = 10 * 60 * 1000;
+
+const getMailer = () => {
+  const smtpUser = process.env.GMAIL_USER || process.env.SMTP_USER;
+  const smtpPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
+  const oauthClientId = process.env.GMAIL_OAUTH_CLIENT_ID || process.env.SMTP_OAUTH_CLIENT_ID;
+  const oauthClientSecret = process.env.GMAIL_OAUTH_CLIENT_SECRET || process.env.SMTP_OAUTH_CLIENT_SECRET;
+  const oauthRefreshToken = process.env.GMAIL_OAUTH_REFRESH_TOKEN || process.env.SMTP_OAUTH_REFRESH_TOKEN;
+
+  if (!smtpUser) return null;
+
+  const smtpHost = process.env.SMTP_HOST;
+  if (smtpHost) {
+    const smtpPort = Number(process.env.SMTP_PORT || 587);
+    const smtpSecure = String(process.env.SMTP_SECURE || "false").toLowerCase() === "true";
+    return nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpSecure,
+      auth: oauthClientId && oauthClientSecret && oauthRefreshToken
+        ? {
+            type: "OAuth2",
+            user: smtpUser,
+            clientId: oauthClientId,
+            clientSecret: oauthClientSecret,
+            refreshToken: oauthRefreshToken,
+          }
+        : smtpPass
+          ? { user: smtpUser, pass: smtpPass }
+          : undefined,
+    });
+  }
+
+  const service = process.env.SMTP_SERVICE || "gmail";
+  if (oauthClientId && oauthClientSecret && oauthRefreshToken) {
+    return nodemailer.createTransport({
+      service,
+      auth: {
+        type: "OAuth2",
+        user: smtpUser,
+        clientId: oauthClientId,
+        clientSecret: oauthClientSecret,
+        refreshToken: oauthRefreshToken,
+      },
+    });
+  }
+
+  if (smtpPass) {
+    return nodemailer.createTransport({ service, auth: { user: smtpUser, pass: smtpPass } });
+  }
+
+  return null;
+};
+
+const makeOtp = () => String(Math.floor(100000 + Math.random() * 900000));
+
+const hashOtp = (email, otp) => {
+  const secret = process.env.OTP_SECRET || process.env.JWT_SECRET || "otp";
+  return crypto.createHash("sha256").update(`${email}:${otp}:${secret}`).digest("hex");
+};
+
+const sendOtpEmail = async ({ to, otp }) => {
+  try {
+    const transporter = getMailer();
+    if (!transporter) return { sent: false, reason: "not_configured" };
+
+    const from = process.env.SMTP_FROM || process.env.GMAIL_USER || process.env.SMTP_USER;
+    await transporter.verify();
+    const info = await transporter.sendMail({
+      from,
+      to,
+      subject: "CampusConnect Email Verification OTP",
+      text: `Your CampusConnect verification OTP is: ${otp}\n\nThis code expires in 10 minutes.`,
+    });
+    return { sent: true, messageId: info?.messageId };
+  } catch (err) {
+    return { sent: false, reason: "send_failed", error: err?.message || String(err) };
+  }
+};
 
 /** Register Company */
 export const registerCompany = async (req, res) => {
@@ -14,8 +96,52 @@ export const registerCompany = async (req, res) => {
     if (!name || !email || !password || !image)
       return res.json({ success: false, message: "All fields required" });
 
-    if (await Company.findOne({ email }))
+    if (process.env.NODE_ENV === "production" && !getMailer()) {
+      return res.status(500).json({
+        success: false,
+        message: "Email verification is not configured. Please set GMAIL_USER and GMAIL_APP_PASSWORD in backend environment variables.",
+      });
+    }
+
+    const existing = await Company.findOne({ email });
+    if (existing) {
+      if (existing.isVerified === false) {
+        if (process.env.NODE_ENV === "production" && !getMailer()) {
+          return res.status(500).json({
+            success: false,
+            message: "Email verification is not configured. Please set GMAIL_USER and GMAIL_APP_PASSWORD in backend environment variables.",
+          });
+        }
+
+        const otp = makeOtp();
+        existing.emailOtpHash = hashOtp(email, otp);
+        existing.emailOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+        await existing.save();
+
+        const emailResult = await sendOtpEmail({ to: email, otp });
+        if (!emailResult.sent) {
+          console.error("Email OTP send failed:", emailResult.reason, emailResult.error || "");
+        }
+        const response = {
+          success: true,
+          message:
+            emailResult.sent
+              ? "OTP resent to your email. Please verify to complete registration."
+              : "Account already exists but email OTP could not be sent. Please configure email or try again later.",
+          requiresVerification: true,
+          email,
+        };
+
+        if (!emailResult.sent && process.env.NODE_ENV !== "production") {
+          response.devOtp = otp;
+          if (emailResult.error) response.devEmailError = emailResult.error;
+        }
+
+        return res.status(200).json(response);
+      }
+
       return res.status(409).json({ success: false, message: "Company already exists" });
+    }
 
     const hasCloudinary =
       process.env.CLOUDINARY_CLOUD_NAME &&
@@ -40,24 +166,138 @@ export const registerCompany = async (req, res) => {
       });
     }
 
+    const otp = makeOtp();
     const company = await Company.create({
       name,
       email,
       password,
       image: logo.secure_url,
+      isVerified: false,
+      emailOtpHash: hashOtp(email, otp),
+      emailOtpExpiresAt: new Date(Date.now() + OTP_TTL_MS),
     });
 
-    const token = generateToken(company._id);
-    res.status(201).json({
+    const emailResult = await sendOtpEmail({ to: email, otp });
+    if (!emailResult.sent) {
+      console.error("Email OTP send failed:", emailResult.reason, emailResult.error || "");
+    }
+    const response = {
       success: true,
-      message: "Registration successful",
-      companyData: company,
-      company,
-      token,
-    });
+      message:
+        emailResult.sent
+          ? "OTP sent to your email. Please verify to complete registration."
+          : "Account created but email OTP could not be sent. Please configure email or try resend OTP.",
+      requiresVerification: true,
+      email,
+    };
+
+    if (!emailResult.sent && process.env.NODE_ENV !== "production") {
+      response.devOtp = otp;
+      if (emailResult.error) response.devEmailError = emailResult.error;
+    }
+
+    res.status(201).json(response);
   } catch (error) {
     console.error("Company registration failed:", error?.message || error);
     res.status(500).json({ success: false, message: "Registration failed" });
+  }
+};
+
+export const verifyCompanyEmailOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body || {};
+    if (!email || !otp)
+      return res.status(400).json({ success: false, message: "Email and OTP required" });
+
+    const company = await Company.findOne({ email });
+    if (!company) return res.status(404).json({ success: false, message: "Company not found" });
+
+    if (company.isVerified === true) {
+      const token = generateToken(company._id);
+      const companyData = company.toObject();
+      delete companyData.password;
+      return res.json({
+        success: true,
+        message: "Email already verified",
+        companyData,
+        company: companyData,
+        token,
+      });
+    }
+
+    if (!company.emailOtpHash || !company.emailOtpExpiresAt) {
+      return res.status(400).json({ success: false, message: "OTP not generated. Please resend OTP." });
+    }
+
+    if (company.emailOtpExpiresAt.getTime() < Date.now()) {
+      return res.status(400).json({ success: false, message: "OTP expired. Please resend OTP." });
+    }
+
+    const incomingHash = hashOtp(email, String(otp).trim());
+    if (incomingHash !== company.emailOtpHash) {
+      return res.status(400).json({ success: false, message: "Invalid OTP" });
+    }
+
+    company.isVerified = true;
+    company.emailOtpHash = "";
+    company.emailOtpExpiresAt = null;
+    await company.save();
+
+    const token = generateToken(company._id);
+    const companyData = company.toObject();
+    delete companyData.password;
+    res.json({
+      success: true,
+      message: "Email verified successfully",
+      companyData,
+      company: companyData,
+      token,
+    });
+  } catch (error) {
+    console.error("Verify company email error:", error);
+    res.status(500).json({ success: false, message: "Email verification failed" });
+  }
+};
+
+export const resendCompanyEmailOtp = async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    if (!email) return res.status(400).json({ success: false, message: "Email required" });
+
+    if (process.env.NODE_ENV === "production" && !getMailer()) {
+      return res.status(500).json({
+        success: false,
+        message: "Email verification is not configured. Please set GMAIL_USER and GMAIL_APP_PASSWORD in backend environment variables.",
+      });
+    }
+
+    const company = await Company.findOne({ email });
+    if (!company) return res.status(404).json({ success: false, message: "Company not found" });
+    if (company.isVerified === true) return res.status(400).json({ success: false, message: "Email already verified" });
+
+    const otp = makeOtp();
+    company.emailOtpHash = hashOtp(email, otp);
+    company.emailOtpExpiresAt = new Date(Date.now() + OTP_TTL_MS);
+    await company.save();
+
+    const emailResult = await sendOtpEmail({ to: email, otp });
+    if (!emailResult.sent) {
+      console.error("Email OTP send failed:", emailResult.reason, emailResult.error || "");
+    }
+    const response = {
+      success: true,
+      message: emailResult.sent ? "OTP resent to your email" : "Email OTP could not be sent. Please configure email or try again later.",
+    };
+
+    if (!emailResult.sent && process.env.NODE_ENV !== "production") {
+      response.devOtp = otp;
+      if (emailResult.error) response.devEmailError = emailResult.error;
+    }
+
+    res.json(response);
+  } catch (error) {
+    console.error("Resend company OTP error:", error);
+    res.status(500).json({ success: false, message: "Failed to resend OTP" });
   }
 };
 
@@ -68,15 +308,21 @@ export const loginCompany = async (req, res) => {
     const company = await Company.findOne({ email });
     if (!company) return res.status(404).json({ success: false, message: "Company not found" });
 
+    if (company.isVerified === false) {
+      return res.status(403).json({ success: false, message: "Please verify your email first" });
+    }
+
     const match = await bcrypt.compare(password, company.password);
     if (!match) return res.status(401).json({ success: false, message: "Invalid password" });
 
     const token = generateToken(company._id);
+    const companyData = company.toObject();
+    delete companyData.password;
     res.json({
       success: true,
       message: "Login successful",
-      companyData: company,
-      company,
+      companyData,
+      company: companyData,
       token,
     });
   } catch {

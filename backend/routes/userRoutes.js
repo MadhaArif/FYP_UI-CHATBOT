@@ -4,6 +4,8 @@ import userAuthMiddleware from "../middlewares/userAuthMiddleware.js";
 import {
   registerUser,
   loginUser,
+  verifyUserEmailOtp,
+  resendUserEmailOtp,
   fetchUserData,
   applyJob,
   getUserAppliedJobs,
@@ -14,6 +16,8 @@ import {
 const router = express.Router();
 
 router.post("/register-user", upload.single("image"), registerUser);
+router.post("/verify-email", verifyUserEmailOtp);
+router.post("/resend-otp", resendUserEmailOtp);
 router.post("/login-user", loginUser);
 router.get("/user-data", userAuthMiddleware, fetchUserData);
 router.post("/apply-job", userAuthMiddleware, applyJob);
