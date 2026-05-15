@@ -51,6 +51,13 @@ app.get("/", (req, res) => res.send("✅ API is working fine on Vercel"));
 if (process.env.NODE_ENV === 'production') {
   app.use(async (req, res, next) => {
     try {
+      const dbUri = process.env.DATABASE_CONNECTION_URL || process.env.MONGODB_URI;
+      if (!dbUri) {
+        return res.status(500).json({
+          success: false,
+          message: "Database connection string missing. Set MONGODB_URI or DATABASE_CONNECTION_URL in backend environment variables.",
+        });
+      }
       await connectDB();
       next();
     } catch (err) {
